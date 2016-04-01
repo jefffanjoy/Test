@@ -3,16 +3,10 @@
     "contentVersion": "1.0",
     "parameters": {
         "accountName": {
-            "type": "string",
-            "metadata": {
-                "description": "The name of the Azure Automation account to deploy to."
-            }
+            "type": "string"
         },
         "variableName": {
-            "type": "string",
-            "metadata": {
-                "description": "The automation variable to be referenced for output."
-            }
+            "type": "string"
         }
     },
     "variables": {},
