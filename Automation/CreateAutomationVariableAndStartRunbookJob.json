@@ -41,7 +41,7 @@
 		}
     },
     "variables": {
-		"templatelink": "https://raw.githubusercontent.com/jefffanjoy/Test/master/GetVariableDataNestedDeploymentTemplate.json",
+		"templatelink": "https://raw.githubusercontent.com/jefffanjoy/Test/master/Automation/GetVariableDataNestedDeploymentTemplate.json",
     },
     "resources": [
 		{
