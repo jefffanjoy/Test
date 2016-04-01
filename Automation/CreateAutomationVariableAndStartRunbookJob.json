@@ -1,0 +1,101 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0",
+    "parameters": {
+        "accountName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Azure Automation account to deploy to."
+            }
+        },
+        "regionId": {
+            "type": "string",
+            "allowedValues": [
+                "Japan East",
+                "East US 2",
+                "West Europe",
+                "Southeast Asia",
+                "South Central US"
+            ],
+            "metadata": {
+                "description": "The region to deploy the Automation account in."
+            }
+        },
+        "jobId": {
+            "type": "string",
+            "metadata": {
+                "description": "The GUID for the runbook job to be started."
+            }
+        },
+		"runbookName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the runbook."
+			}
+		},
+		"variableName": {
+			"type": "string",
+			"metadata": {
+				"description": "The name of the variable to reference for output."
+			}
+		}
+    },
+    "variables": {
+		"templatelink": "https://raw.githubusercontent.com/jefffanjoy/Test/master/GetVariableDataNestedDeploymentTemplate.json",
+    },
+    "resources": [
+		{
+			"name": "[concat(parameters('accountName'), '/', parameters('variableName'))]",
+			"type": "Microsoft.Automation/automationAccounts/variables",
+			"apiVersion": "2015-10-31",
+			"dependsOn": [],
+			"properties": {
+				"variable": {
+					"name": "[parameters('variableName')]",
+					"type": "string",
+					"value": "",
+					"Encrypted": false
+				}
+			}
+		},
+        {
+			"name": "[concat(parameters('accountName'), '/', parameters('jobId'))]",
+			"type": "Microsoft.Automation/automationAccounts/jobs",
+			"apiVersion": "2015-10-31",
+			"location": "[parameters('regionId')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Automation/automationAccounts/variables', parameters('accountName'), parameters('variableName'))]",
+			],
+			"tags": {
+				"key": "value"
+			},
+			"properties": {
+				"runbook": {
+					"name": "[parameters('runbookName')]"
+				}
+			}
+        },
+		{
+			"name": "variableOutputNestedTemplate",
+			"apiVersion": "2015-01-01",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "incremental",
+				"templatelink": {"uri":"[variables('templatelink')]","contentVersion":"1.0"},
+				"parameters": {
+					"accountName": {"value":"[parameters('accountName')]"},
+					"variableName": {"value":"[parameters('variableName')]"},
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Automation/automationAccounts/jobs', parameters('accountName'), parameters('jobId'))]",
+			]
+		}
+    ],
+    "outputs": {
+        "jobOutput": {
+            "type": "string",
+            "value": "[reference('variableOutputNestedTemplate').outputs.exampleOutput.value]"
+        }
+    }
+}
